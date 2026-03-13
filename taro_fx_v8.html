@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Taro FX" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Taro FX Ver.8 - USD/JPY</title>
+  <style>
+    :root{
+      --bg:#09101b;
+      --panel:#121a2b;
+      --panel2:#18233a;
+      --line:#2a3757;
+      --text:#eef4ff;
+      --muted:#9fb0cf;
+      --accent:#5e97ff;
+      --good:#3ecf8e;
+      --bad:#ff6b6b;
+      --buy:#4da3ff;
+      --warn:#ffd166;
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#09101b 0%,#0f1727 100%);
+    }
+    .wrap{
+      max-width:1500px;
+      margin:0 auto;
+      padding:max(14px, env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
+    }
+    .hero{
+      background:linear-gradient(135deg, rgba(79,140,255,.17), rgba(62,207,142,.08));
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px;
+      margin-bottom:16px;
+      box-shadow:0 10px 28px rgba(0,0,0,.18);
+    }
+    .hero-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .icon{
+      width:64px;height:64px;border-radius:18px;
+      display:grid;place-items:center;
+      font-size:30px;
+      background:linear-gradient(180deg,#5e97ff 0%,#2f6fe8 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 20px rgba(0,0,0,.24);
+    }
+    .title{margin:0;font-size:28px;font-weight:900}
+    .sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .badge-row{display:flex;gap:8px;flex-wrap:wrap}
+    .badge{
+      background:rgba(18,26,43,.9);
+      border:1px solid var(--line);
+      color:var(--muted);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+    }
+    .nav{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:14px
+    }
+    .nav button{
+      width:auto;padding:10px 12px;border-radius:999px;
+      border:1px solid var(--line);background:#162036;color:var(--text);cursor:pointer
+    }
+
+    .panel{
+      background:rgba(18,26,43,.96);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.22);
+      margin-bottom:16px;
+    }
+    .section-title{margin:0 0 12px;font-size:20px;font-weight:900}
+    .foot{margin-top:10px;color:var(--muted);font-size:12px}
+    .grid{
+      display:grid;
+      grid-template-columns:1.45fr .95fr;
+      gap:16px;
+      align-items:start;
+    }
+    .right-col{display:grid;gap:16px}
+    .chart-panel{padding:14px}
+    .chart-top{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .time-tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .time-tabs button,.small-btn{
+      width:auto;padding:10px 14px;border-radius:12px;
+      border:1px solid var(--line);background:#162036;color:var(--text);cursor:pointer;font-weight:700
+    }
+    .time-tabs button.active{background:linear-gradient(180deg,#5e97ff 0%,#3f7ff7 100%);border:none}
+    .chart-wrap{height:900px}
+    .tv-iframe{
+      width:100%;height:100%;border:0;border-radius:14px;background:#0b1220
+    }
+
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select,textarea,button{
+      width:100%;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0e1626;
+      color:var(--text);
+      padding:11px 12px;
+      font-size:14px;
+    }
+    textarea{min-height:90px;resize:vertical}
+    button.primary{
+      background:linear-gradient(180deg,#5e97ff 0%,#3f7ff7 100%);
+      border:none;font-weight:800;cursor:pointer
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+    .small-cards{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .small-card,.zone-card{
+      background:#0d1524;border:1px solid var(--line);border-radius:14px;padding:12px
+    }
+    .k{color:var(--muted);font-size:12px;margin-bottom:7px}
+    .v{font-size:20px;font-weight:900}
+    .signal-good{color:var(--good)}
+    .signal-bad{color:var(--bad)}
+    .signal-buy{color:var(--buy)}
+    .signal-warn{color:var(--warn)}
+    .zone-stack{display:grid;gap:12px}
+    .zone-card.sell{border-color:rgba(255,107,107,.5);background:linear-gradient(180deg, rgba(255,107,107,.12), rgba(13,21,36,1))}
+    .zone-card.buy{border-color:rgba(77,163,255,.5);background:linear-gradient(180deg, rgba(77,163,255,.12), rgba(13,21,36,1))}
+    .zone-band{
+      height:22px;border-radius:999px;position:relative;overflow:hidden;
+      border:1px solid var(--line);background:#0a1120;margin:10px 0 8px;
+    }
+    .zone-fill.sell{position:absolute;inset:0;background:linear-gradient(90deg, rgba(255,107,107,.35), rgba(255,107,107,.85), rgba(255,107,107,.35))}
+    .zone-fill.buy{position:absolute;inset:0;background:linear-gradient(90deg, rgba(77,163,255,.35), rgba(77,163,255,.85), rgba(77,163,255,.35))}
+    .zone-price-row{
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px
+    }
+    .zone-price-row div{
+      background:#111a2b;border:1px solid var(--line);border-radius:10px;padding:8px
+    }
+    .check-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px
+    }
+    .check-item{
+      display:flex;align-items:center;gap:8px;
+      background:#0d1524;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:13px
+    }
+    .check-item input{width:auto;transform:scale(1.15)}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{color:var(--muted);font-weight:600}
+    .calendar-controls{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end;margin-bottom:12px}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+    .dow{color:var(--muted);font-size:12px;text-align:center;padding:4px 0}
+    .day-cell{
+      min-height:92px;background:#0d1524;border:1px solid var(--line);
+      border-radius:14px;padding:8px;display:flex;flex-direction:column;justify-content:space-between
+    }
+    .day-cell.empty{opacity:.35}
+    .day-top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}
+    .day-num{font-weight:700}
+    .day-balance{font-size:15px;font-weight:900;text-align:right;word-break:break-word}
+    .day-note{color:var(--muted);font-size:11px;text-align:right;margin-top:4px}
+
+    @media (max-width: 1180px){
+      .grid{grid-template-columns:1fr}
+      .chart-wrap{height:760px}
+    }
+    @media (max-width: 820px){
+      .title{font-size:23px}
+      .chart-wrap{height:560px}
+      .small-cards,.form-grid,.check-grid{grid-template-columns:1fr 1fr}
+      .calendar-controls{grid-template-columns:1fr 1fr}
+      .calendar-controls > :first-child{grid-column:1/-1}
+    }
+    @media (max-width: 640px){
+      .wrap{padding:12px}
+      .panel{padding:14px;border-radius:16px}
+      .title{font-size:21px}
+      .icon{width:56px;height:56px;font-size:26px}
+      .chart-wrap{height:440px}
+      .small-cards,.form-grid,.check-grid{grid-template-columns:1fr}
+      input,select,textarea,button{font-size:16px;padding:12px}
+      .calendar-grid{gap:6px}
+      .day-cell{min-height:76px;border-radius:12px}
+      .day-balance{font-size:12px}
+      th,td{padding:8px 6px;font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-head">
+        <div class="brand">
+          <div class="icon">📈</div>
+          <div>
+            <h1 class="title">Taro FX Ver.8</h1>
+            <div class="sub">USD/JPY専用。大きいチャート、戻り売りゾーン、押し目買いゾーン、サイン、履歴、残高カレンダー。</div>
+          </div>
+        </div>
+        <div class="badge-row">
+          <div class="badge">USD/JPY専用</div>
+          <div class="badge">SELL ZONE 赤</div>
+          <div class="badge">BUY ZONE 青</div>
+          <div class="badge">ゾーン幅 15pips</div>
+          <div class="badge">1分 + 5分 確認</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button type="button" onclick="jumpTo('chartSection')">チャート</button>
+        <button type="button" onclick="jumpTo('zoneSection')">ゾーン判定</button>
+        <button type="button" onclick="jumpTo('historySection')">履歴</button>
+        <button type="button" onclick="jumpTo('calendarSection')">残高</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="panel chart-panel" id="chartSection">
+          <div class="chart-top">
+            <div class="time-tabs">
+              <button class="active" data-interval="1">1分</button>
+              <button data-interval="5">5分</button>
+              <button data-interval="60">1時間</button>
+              <button data-interval="240">4時間</button>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="small-btn" type="button" id="refreshChart">チャート更新</button>
+              <button class="small-btn" type="button" onclick="window.open(currentChartUrl(),'_blank')">全画面</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div id="tv_chart" style="height:100%;"></div>
+          </div>
+          <div class="foot">チャートを大きめにしてある。iPhoneは横向き、iPadは横向きだとさらに見やすい。</div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="panel" id="zoneSection">
+          <div class="section-title">ゾーン判定エンジン</div>
+          <div class="form-grid">
+            <div>
+              <label>相場の流れ</label>
+              <select id="trend">
+                <option value="down" selected>下降トレンド（戻り売り）</option>
+                <option value="up">上昇トレンド（押し目買い）</option>
+                <option value="range">レンジ / 様子見</option>
+              </select>
+            </div>
+            <div>
+              <label>現在価格</label>
+              <input id="currentPrice" type="number" step="0.001" placeholder="例 149.250" />
+            </div>
+            <div>
+              <label>直近スイング高値</label>
+              <input id="swingHigh" type="number" step="0.001" placeholder="例 149.800" />
+            </div>
+            <div>
+              <label>直近スイング安値</label>
+              <input id="swingLow" type="number" step="0.001" placeholder="例 148.600" />
+            </div>
+            <div>
+              <label>20MA</label>
+              <input id="ma20" type="number" step="0.001" placeholder="例 149.210" />
+            </div>
+            <div>
+              <label>50MA</label>
+              <input id="ma50" type="number" step="0.001" placeholder="例 149.360" />
+            </div>
+            <div>
+              <label>RSI</label>
+              <input id="rsi" type="number" step="0.1" placeholder="例 63.5" />
+            </div>
+            <div>
+              <label>ロット</label>
+              <input id="lot" type="number" step="0.01" value="0.10" />
+            </div>
+          </div>
+
+          <div class="check-grid">
+            <label class="check-item"><input type="checkbox" id="check1mSell"> 1分足 反転確認（売り）</label>
+            <label class="check-item"><input type="checkbox" id="check5mSell"> 5分足 反転確認（売り）</label>
+            <label class="check-item"><input type="checkbox" id="check1mBuy"> 1分足 反転確認（買い）</label>
+            <label class="check-item"><input type="checkbox" id="check5mBuy"> 5分足 反転確認（買い）</label>
+          </div>
+
+          <div class="small-cards">
+            <div class="small-card">
+              <div class="k">総合サイン</div>
+              <div class="v" id="mainSignal">様子見</div>
+            </div>
+            <div class="small-card">
+              <div class="k">SELL判定</div>
+              <div class="v" id="sellSignal">-</div>
+            </div>
+            <div class="small-card">
+              <div class="k">BUY判定</div>
+              <div class="v" id="buySignal">-</div>
+            </div>
+          </div>
+
+          <div class="zone-stack">
+            <div class="zone-card sell">
+              <div class="k">戻り売りゾーン（赤 / 幅15pips）</div>
+              <div class="v" id="sellZoneCenter">-</div>
+              <div class="zone-band"><div class="zone-fill sell"></div></div>
+              <div class="zone-price-row">
+                <div><span class="k">上限</span><br><strong id="sellZoneHigh">-</strong></div>
+                <div><span class="k">中心</span><br><strong id="sellZoneMid">-</strong></div>
+                <div><span class="k">下限</span><br><strong id="sellZoneLow">-</strong></div>
+              </div>
+              <div class="foot" id="sellReason">高値 / フィボ / MAが近いほど強い。</div>
+            </div>
+
+            <div class="zone-card buy">
+              <div class="k">押し目買いゾーン（青 / 幅15pips）</div>
+              <div class="v" id="buyZoneCenter">-</div>
+              <div class="zone-band"><div class="zone-fill buy"></div></div>
+              <div class="zone-price-row">
+                <div><span class="k">上限</span><br><strong id="buyZoneHigh">-</strong></div>
+                <div><span class="k">中心</span><br><strong id="buyZoneMid">-</strong></div>
+                <div><span class="k">下限</span><br><strong id="buyZoneLow">-</strong></div>
+              </div>
+              <div class="foot" id="buyReason">安値 / フィボ / MAが近いほど強い。</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label>戦略メモ</label>
+            <textarea id="memo" placeholder="例：4時間足下降。1時間足の戻り待ち。5分足で戻り完了、1分足の反転を待つ。"></textarea>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+            <button class="primary" id="saveScenario">シナリオ保存</button>
+            <button type="button" id="recalcZones">ゾーン再計算</button>
+          </div>
+          <div class="foot">SELLは RSI 60以上 + 1分/5分確認で強い。BUYは RSI 40以下 + 1分/5分確認で強い。</div>
+        </div>
+
+        <div class="panel" id="historySection">
+          <div class="section-title">トレード履歴</div>
+          <div class="small-cards" style="margin-top:0; margin-bottom:12px;">
+            <div class="small-card"><div class="k">総件数</div><div class="v" id="tradeCountView">0</div></div>
+            <div class="small-card"><div class="k">勝率</div><div class="v" id="winRateView">0%</div></div>
+            <div class="small-card"><div class="k">平均R</div><div class="v" id="avgRView">0.00R</div></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <button class="primary" id="addTrade">履歴に追加</button>
+            <button type="button" id="clearTrades">履歴を全消去</button>
+          </div>
+          <div style="overflow:auto; max-height:280px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>日時</th>
+                  <th>サイン</th>
+                  <th>結果</th>
+                  <th>メモ</th>
+                </tr>
+              </thead>
+              <tbody id="tradeTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel" id="calendarSection">
+          <div class="section-title">残高カレンダー</div>
+          <div class="calendar-controls">
+            <div>
+              <label>開始残高</label>
+              <input id="startingBalance" type="number" step="1" placeholder="例 100000" />
+            </div>
+            <button type="button" id="prevMonth">前月</button>
+            <button type="button" id="nextMonth">次月</button>
+          </div>
+          <div class="small-cards" style="margin-top:0; margin-bottom:12px;">
+            <div class="small-card"><div class="k">表示月</div><div class="v" id="monthLabelView">-</div></div>
+            <div class="small-card"><div class="k">月末残高</div><div class="v" id="monthEndBalanceView">-</div></div>
+            <div class="small-card"><div class="k">月間増減</div><div class="v" id="monthDeltaView">-</div></div>
+          </div>
+          <div class="calendar-grid" id="balanceCalendar"></div>
+          <div class="foot">履歴に入れた損益金額を日ごとの残高に反映。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let currentInterval = '1';
+    let calendarDate = new Date();
+
+    function jumpTo(id){
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    function currentChartUrl() {
+      const symbol = encodeURIComponent('OANDA:USDJPY');
+      const interval = currentInterval;
+      return `https://s.tradingview.com/widgetembed/?frameElementId=tv_chart&symbol=${symbol}&interval=${interval}&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=0b1220&studies=%5B%22BB%40tv-basicstudies%22%2C%22RSI%40tv-basicstudies%22%2C%22MASimple%40tv-basicstudies%22%2C%22MASimple%40tv-basicstudies%22%5D&theme=dark&style=1&timezone=Asia%2FTokyo&withdateranges=1&hideideas=1&locale=ja`;
+    }
+
+    function renderChart() {
+      $('tv_chart').innerHTML = `<iframe class="tv-iframe" src="${currentChartUrl()}" allowtransparency="true" scrolling="no" allowfullscreen></iframe>`;
+      document.querySelectorAll('.time-tabs button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.interval === currentInterval);
+      });
+    }
+
+    function n(v){ return v === '' ? null : Number(v); }
+    function f3(v){ return Number(v).toFixed(3); }
+    function jpy(v){ return Number(v || 0).toLocaleString('ja-JP'); }
+
+    function calcZones() {
+      const trend = $('trend').value;
+      const high = n($('swingHigh').value);
+      const low = n($('swingLow').value);
+      const ma20 = n($('ma20').value);
+      const ma50 = n($('ma50').value);
+      const price = n($('currentPrice').value);
+      const rsi = n($('rsi').value);
+
+      const width = 0.150; // 15 pips
+      const sellChecks = [$('check1mSell').checked, $('check5mSell').checked].filter(Boolean).length;
+      const buyChecks = [$('check1mBuy').checked, $('check5mBuy').checked].filter(Boolean).length;
+
+      let sellCenter = null;
+      let buyCenter = null;
+      let fib382 = null, fib50 = null, fib618 = null;
+
+      if (high != null && low != null && high > low) {
+        const range = high - low;
+        fib382 = high - range * 0.382;
+        fib50 = high - range * 0.5;
+        fib618 = high - range * 0.618;
+
+        const sellPoints = [fib382, fib50, fib618, ma20, ma50].filter(v => typeof v === 'number' && !Number.isNaN(v));
+        const buyPoints = [low + range * 0.382, low + range * 0.5, low + range * 0.618, ma20, ma50].filter(v => typeof v === 'number' && !Number.isNaN(v));
+
+        if (sellPoints.length) sellCenter = sellPoints.reduce((a,b)=>a+b,0) / sellPoints.length;
+        if (buyPoints.length) buyCenter = buyPoints.reduce((a,b)=>a+b,0) / buyPoints.length;
+      }
+
+      function fillZone(prefix, center, type) {
+        if (center == null) {
+          $(`${prefix}ZoneCenter`).textContent = '-';
+          $(`${prefix}ZoneHigh`).textContent = '-';
+          $(`${prefix}ZoneMid`).textContent = '-';
+          $(`${prefix}ZoneLow`).textContent = '-';
+          return null;
+        }
+        const highZ = center + width / 2;
+        const lowZ = center - width / 2;
+        $(`${prefix}ZoneCenter`).textContent = `${type === 'sell' ? 'SELL' : 'BUY'} ZONE ${f3(center)}`;
+        $(`${prefix}ZoneHigh`).textContent = f3(highZ);
+        $(`${prefix}ZoneMid`).textContent = f3(center);
+        $(`${prefix}ZoneLow`).textContent = f3(lowZ);
+        return {high: highZ, mid: center, low: lowZ};
+      }
+
+      const sellZone = fillZone('sell', sellCenter, 'sell');
+      const buyZone = fillZone('buy', buyCenter, 'buy');
+
+      let sellSignal = '待機';
+      let buySignal = '待機';
+      let mainSignal = '様子見';
+      let sellClass = '';
+      let buyClass = '';
+      let mainClass = '';
+
+      const inSell = sellZone && price != null && price >= sellZone.low && price <= sellZone.high;
+      const inBuy = buyZone && price != null && price >= buyZone.low && price <= buyZone.high;
+
+      if (sellZone) {
+        $('sellReason').textContent = `直近高値/フィボ/20MA/50MA の平均から算出。 38.2=${fib382 ? f3(fib382) : '-'} 50=${fib50 ? f3(fib50) : '-'} 61.8=${fib618 ? f3(fib618) : '-'}`;
+      }
+      if (buyZone) {
+        $('buyReason').textContent = `直近安値側の押し目候補。 20MAと50MAが近いほど強い。`;
+      }
+
+      if (inSell) {
+        sellSignal = 'SELL準備';
+        sellClass = 'signal-bad';
+        if (trend === 'down' && sellChecks === 2) {
+          sellSignal = 'SELL ENTRY候補';
+          sellClass = 'signal-bad';
+          if (rsi != null && rsi >= 60) {
+            sellSignal = '強い戻り売り';
+            sellClass = 'signal-bad';
+          }
+        }
+      } else if (trend === 'down' && sellChecks === 2 && price != null && sellZone && price < sellZone.low) {
+        sellSignal = '戻り待ち';
+        sellClass = 'signal-warn';
+      }
+
+      if (inBuy) {
+        buySignal = 'BUY準備';
+        buyClass = 'signal-buy';
+        if (trend === 'up' && buyChecks === 2) {
+          buySignal = 'BUY ENTRY候補';
+          buyClass = 'signal-buy';
+          if (rsi != null && rsi <= 40) {
+            buySignal = '強い押し目買い';
+            buyClass = 'signal-buy';
+          }
+        }
+      } else if (trend === 'up' && buyChecks === 2 && price != null && buyZone && price > buyZone.high) {
+        buySignal = '押し待ち';
+        buyClass = 'signal-warn';
+      }
+
+      if (trend === 'range') {
+        mainSignal = 'レンジ様子見';
+        mainClass = 'signal-warn';
+      } else if (sellSignal === '強い戻り売り') {
+        mainSignal = '強い戻り売り';
+        mainClass = 'signal-bad';
+      } else if (sellSignal === 'SELL ENTRY候補') {
+        mainSignal = 'SELL ENTRY候補';
+        mainClass = 'signal-bad';
+      } else if (buySignal === '強い押し目買い') {
+        mainSignal = '強い押し目買い';
+        mainClass = 'signal-buy';
+      } else if (buySignal === 'BUY ENTRY候補') {
+        mainSignal = 'BUY ENTRY候補';
+        mainClass = 'signal-buy';
+      } else if (inSell) {
+        mainSignal = 'SELL準備';
+        mainClass = 'signal-warn';
+      } else if (inBuy) {
+        mainSignal = 'BUY準備';
+        mainClass = 'signal-warn';
+      }
+
+      $('sellSignal').textContent = sellSignal;
+      $('buySignal').textContent = buySignal;
+      $('mainSignal').textContent = mainSignal;
+      $('sellSignal').className = `v ${sellClass}`;
+      $('buySignal').className = `v ${buyClass}`;
+      $('mainSignal').className = `v ${mainClass}`;
+    }
+
+    function saveScenario() {
+      const data = {
+        trend: $('trend').value,
+        currentPrice: $('currentPrice').value,
+        swingHigh: $('swingHigh').value,
+        swingLow: $('swingLow').value,
+        ma20: $('ma20').value,
+        ma50: $('ma50').value,
+        rsi: $('rsi').value,
+        lot: $('lot').value,
+        memo: $('memo').value,
+        check1mSell: $('check1mSell').checked,
+        check5mSell: $('check5mSell').checked,
+        check1mBuy: $('check1mBuy').checked,
+        check5mBuy: $('check5mBuy').checked,
+        startingBalance: $('startingBalance').value,
+        savedAt: new Date().toLocaleString('ja-JP')
+      };
+      localStorage.setItem('taro-fx-v8-scenario', JSON.stringify(data));
+      alert('シナリオを保存したよ');
+    }
+
+    function loadScenario() {
+      const raw = localStorage.getItem('taro-fx-v8-scenario');
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      ['trend','currentPrice','swingHigh','swingLow','ma20','ma50','rsi','lot','memo','startingBalance'].forEach(key => {
+        if ($(key) && d[key] != null) $(key).value = d[key];
+      });
+      ['check1mSell','check5mSell','check1mBuy','check5mBuy'].forEach(key => {
+        if ($(key) && d[key] != null) $(key).checked = !!d[key];
+      });
+    }
+
+    function renderTradeStats(rows) {
+      const count = rows.length;
+      const wins = rows.filter(r => (r.resultRNum ?? 0) > 0).length;
+      const avgR = count ? rows.reduce((s,r)=>s+(r.resultRNum ?? 0),0) / count : 0;
+      $('tradeCountView').textContent = String(count);
+      $('winRateView').textContent = count ? ((wins/count)*100).toFixed(0) + '%' : '0%';
+      $('avgRView').textContent = avgR.toFixed(2) + 'R';
+    }
+
+    function loadTrades() {
+      const rows = JSON.parse(localStorage.getItem('taro-fx-v8-trades') || '[]');
+      const tbody = $('tradeTable');
+      tbody.innerHTML = '';
+      renderTradeStats(rows);
+      renderBalanceCalendar(rows);
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#9fb0cf;">まだ履歴はありません</td></tr>';
+        return;
+      }
+      rows.slice().reverse().forEach(row => {
+        const tr = document.createElement('tr');
+        const cls = row.resultRNum > 0 ? 'signal-good' : row.resultRNum < 0 ? 'signal-bad' : 'signal-warn';
+        tr.innerHTML = `
+          <td>${row.date}</td>
+          <td><strong>${row.signal}</strong><br><span style="color:#9fb0cf">${row.priceLabel}</span></td>
+          <td class="${cls}">${row.resultR}<br><span style="color:#9fb0cf">${row.pnlAmount > 0 ? '+' : ''}${jpy(row.pnlAmount)}</span></td>
+          <td>${row.memo || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addTrade() {
+      const signal = $('mainSignal').textContent || '様子見';
+      const price = n($('currentPrice').value);
+      const result = window.prompt('結果Rを入れてね。利確なら 2、損切りなら -1、建値なら 0', '0');
+      if (result === null) return;
+      const pnl = window.prompt('損益金額を入れてね。例: 3500 / -1200', '0');
+      if (pnl === null) return;
+      const resultRNum = Number(result);
+      const pnlAmount = Number(pnl);
+      const rows = JSON.parse(localStorage.getItem('taro-fx-v8-trades') || '[]');
+      const now = new Date();
+      rows.push({
+        date: now.toLocaleString('ja-JP'),
+        isoDate: now.toISOString(),
+        signal,
+        priceLabel: price == null ? '価格未入力' : `現在価格 ${f3(price)}`,
+        resultR: (Number.isFinite(resultRNum) ? resultRNum : 0).toFixed(2) + 'R',
+        resultRNum: Number.isFinite(resultRNum) ? resultRNum : 0,
+        pnlAmount: Number.isFinite(pnlAmount) ? pnlAmount : 0,
+        memo: $('memo').value.trim()
+      });
+      localStorage.setItem('taro-fx-v8-trades', JSON.stringify(rows));
+      loadTrades();
+      alert('履歴に追加したよ');
+    }
+
+    function clearTrades() {
+      if (!confirm('履歴を全部消す？')) return;
+      localStorage.removeItem('taro-fx-v8-trades');
+      loadTrades();
+    }
+
+    function tradeDateKey(value) {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return null;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function dailyPnlMap(rows) {
+      const map = {};
+      rows.forEach(row => {
+        const key = tradeDateKey(row.isoDate || row.date);
+        if (!key) return;
+        map[key] = (map[key] || 0) + Number(row.pnlAmount || 0);
+      });
+      return map;
+    }
+
+    function balanceBeforeMonth(rows, year, monthIndex) {
+      const start = n($('startingBalance').value) || 0;
+      const map = dailyPnlMap(rows);
+      let balance = start;
+      Object.keys(map).sort().forEach(key => {
+        const d = new Date(key + 'T00:00:00');
+        if (d.getFullYear() < year || (d.getFullYear() === year && d.getMonth() < monthIndex)) {
+          balance += map[key];
+        }
+      });
+      return balance;
+    }
+
+    function renderBalanceCalendar(rows) {
+      const grid = $('balanceCalendar');
+      const current = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+      const year = current.getFullYear();
+      const monthIndex = current.getMonth();
+      const firstDay = new Date(year, monthIndex, 1);
+      const lastDay = new Date(year, monthIndex + 1, 0);
+      const startWeekday = firstDay.getDay();
+      const daysInMonth = lastDay.getDate();
+      const map = dailyPnlMap(rows);
+
+      $('monthLabelView').textContent = `${year}/${String(monthIndex + 1).padStart(2,'0')}`;
+      let runningBalance = balanceBeforeMonth(rows, year, monthIndex);
+      const opening = runningBalance;
+
+      grid.innerHTML = '';
+      ['日','月','火','水','木','金','土'].forEach(dow => {
+        const el = document.createElement('div');
+        el.className = 'dow';
+        el.textContent = dow;
+        grid.appendChild(el);
+      });
+
+      for (let i = 0; i < startWeekday; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day-cell empty';
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const key = `${year}-${String(monthIndex + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const pnl = map[key] || 0;
+        runningBalance += pnl;
+
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+        const pnlCls = pnl > 0 ? 'signal-good' : pnl < 0 ? 'signal-bad' : '';
+        const balCls = runningBalance >= opening ? 'signal-good' : 'signal-bad';
+        cell.innerHTML = `
+          <div class="day-top">
+            <div class="day-num">${day}</div>
+            <div class="${pnlCls}" style="font-size:11px;">${pnl === 0 ? '±0' : (pnl > 0 ? '+' : '') + jpy(pnl)}</div>
+          </div>
+          <div>
+            <div class="day-balance ${balCls}">${jpy(runningBalance)}</div>
+            <div class="day-note">残高</div>
+          </div>
+        `;
+        grid.appendChild(cell);
+      }
+
+      const delta = runningBalance - opening;
+      $('monthEndBalanceView').textContent = jpy(runningBalance);
+      $('monthDeltaView').textContent = (delta > 0 ? '+' : '') + jpy(delta);
+      $('monthDeltaView').className = `v ${delta > 0 ? 'signal-good' : delta < 0 ? 'signal-bad' : 'signal-warn'}`;
+    }
+
+    // listeners
+    document.querySelectorAll('.time-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentInterval = btn.dataset.interval;
+        renderChart();
+      });
+    });
+    $('refreshChart').addEventListener('click', renderChart);
+    ['trend','currentPrice','swingHigh','swingLow','ma20','ma50','rsi'].forEach(id => $(id).addEventListener('input', calcZones));
+    ['check1mSell','check5mSell','check1mBuy','check5mBuy'].forEach(id => $(id).addEventListener('change', calcZones));
+    $('recalcZones').addEventListener('click', calcZones);
+    $('saveScenario').addEventListener('click', saveScenario);
+    $('addTrade').addEventListener('click', addTrade);
+    $('clearTrades').addEventListener('click', clearTrades);
+    $('startingBalance').addEventListener('input', () => renderBalanceCalendar(JSON.parse(localStorage.getItem('taro-fx-v8-trades') || '[]')));
+    $('prevMonth').addEventListener('click', () => {
+      calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1);
+      renderBalanceCalendar(JSON.parse(localStorage.getItem('taro-fx-v8-trades') || '[]'));
+    });
+    $('nextMonth').addEventListener('click', () => {
+      calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1);
+      renderBalanceCalendar(JSON.parse(localStorage.getItem('taro-fx-v8-trades') || '[]'));
+    });
+
+    loadScenario();
+    renderChart();
+    calcZones();
+    loadTrades();
+  </script>
+</body>
+</html>
